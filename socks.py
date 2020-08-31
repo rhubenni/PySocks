@@ -34,6 +34,8 @@ PRINTABLE_PROXY_TYPES = dict(zip(PROXY_TYPES.values(), PROXY_TYPES.keys()))
 
 _orgsocket = _orig_socket = socket.socket
 
+PROXY_HTTP_AUTH_USERNAME = None
+PROXY_HTTP_AUTH_PASSWORD = None
 
 def set_self_blocking(function):
 
@@ -665,7 +667,16 @@ class socksocket(_BaseSocket):
         """Negotiates a connection through an HTTP server.
 
         NOTE: This currently only supports HTTP CONNECT-style proxies."""
+        global PROXY_HTTP_AUTH_USERNAME
+        global PROXY_HTTP_AUTH_PASSWORD
+
         proxy_type, addr, port, rdns, username, password = self.proxy
+
+        if username is None:
+            username = PROXY_HTTP_AUTH_USERNAME.encode()
+
+        if password is None:
+            password = PROXY_HTTP_AUTH_PASSWORD.encode()
 
         # If we need to resolve locally, we do this now
         addr = dest_addr if rdns else socket.gethostbyname(dest_addr)
